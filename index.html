@@ -6,156 +6,10 @@
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
       .mindar-ui-scanning, .mindar-ui-loading { display: none !important; }
-
-      #ar-overlay {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        pointer-events: none;
-        z-index: 999;
-        display: none;
-      }
-
-      #menu-box {
-        position: absolute;
-        top: 38%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-        pointer-events: auto;
-      }
-
-      #menu-title {
-        background: rgba(40,40,40,0.88);
-        color: #fff;
-        font-size: 16px;
-        font-weight: bold;
-        font-family: sans-serif;
-        padding: 8px 22px;
-        border-radius: 8px;
-        white-space: nowrap;
-      }
-
-      .btn-row { display: flex; gap: 12px; }
-
-      .ar-btn {
-        width: 130px;
-        height: 64px;
-        border: none;
-        border-radius: 10px;
-        color: #fff;
-        font-family: sans-serif;
-        font-size: 15px;
-        font-weight: bold;
-        cursor: pointer;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        line-height: 1.3;
-        -webkit-tap-highlight-color: transparent;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.4);
-      }
-
-      #btn-ep1 { background: #CC0000; }
-      #btn-ep2 { background: #1254A4; }
-      .btn-sub { font-size: 11px; font-weight: normal; opacity: 0.9; }
-
-      /* ========== VIDEO POPUP ========== */
-      #video-modal {
-        display: none;
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: rgba(0,0,0,0.85);
-        z-index: 9999;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-      }
-
-      #video-modal.active {
-        display: flex;
-      }
-
-      #video-container {
-        position: relative;
-        width: 92vw;
-        max-width: 560px;
-        aspect-ratio: 16/9;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-      }
-
-      #video-container iframe {
-        width: 100%;
-        height: 100%;
-        border: none;
-      }
-
-      #close-btn {
-        margin-top: 18px;
-        background: #fff;
-        color: #111;
-        border: none;
-        border-radius: 30px;
-        padding: 10px 36px;
-        font-size: 16px;
-        font-weight: bold;
-        font-family: sans-serif;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      }
-
-      #video-title {
-        color: #fff;
-        font-family: sans-serif;
-        font-size: 14px;
-        margin-bottom: 10px;
-        opacity: 0.85;
-      }
     </style>
   </head>
   <body>
-
-    <!-- AR Overlay ปุ่มเลือก EP -->
-    <div id="ar-overlay">
-      <div id="menu-box">
-        <div id="menu-title">🎬 Mr.CR MENU: Select Video</div>
-        <div class="btn-row">
-          <button id="btn-ep1" class="ar-btn" onclick="openVideo('ep1')">
-            EP.1
-            <span class="btn-sub">Cost Reduction</span>
-          </button>
-          <button id="btn-ep2" class="ar-btn" onclick="openVideo('ep2')">
-            EP.2
-            <span class="btn-sub">Stop Waste!</span>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Video Popup Modal -->
-    <div id="video-modal">
-      <div id="video-title"></div>
-      <div id="video-container">
-        <iframe
-          id="yt-iframe"
-          src=""
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen>
-        </iframe>
-      </div>
-      <button id="close-btn" onclick="closeVideo()">✕ ปิดวิดีโอ</button>
-    </div>
-
     <a-scene
       mindar-image="imageTargetSrc: ./targets.mind;"
       color-space="sRGB"
@@ -163,52 +17,54 @@
       vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false"
     >
+      <a-assets timeout="10000">
+        <!-- PNG จาก GitHub -->
+        <img id="machine-png" src="./Gemini_Generated_Image_35ws6235ws6235ws.png" crossorigin="anonymous"/>
+        <!-- GLB จาก Google Drive -->
+        <a-asset-item id="machine-glb" src="https://drive.google.com/uc?export=download&id=11v1TlCG04sD75l0D0E4k-q9E8z7FFdtU" crossorigin="anonymous"></a-asset-item>
+      </a-assets>
+
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-      <a-entity mindar-image-target="targetIndex: 0"></a-entity>
+
+      <a-entity mindar-image-target="targetIndex: 0">
+
+        <!-- PNG ซ้าย — ลอยขึ้นลง -->
+        <a-image
+          src="#machine-png"
+          width="0.5" height="0.5"
+          position="-0.35 0.1 0.05"
+          animation="property: position;
+                     from: -0.35 0.1 0.05;
+                     to: -0.35 0.17 0.05;
+                     dir: alternate; loop: true; dur: 1800; easing: easeInOutSine"
+        ></a-image>
+        <a-text
+          value="PNG (2D)"
+          color="#FF4444"
+          align="center"
+          position="-0.35 -0.18 0.05"
+          scale="0.4 0.4 0.4"
+        ></a-text>
+
+        <!-- GLB ขวา — หมุน 360° -->
+        <a-entity
+          gltf-model="#machine-glb"
+          scale="0.18 0.18 0.18"
+          position="0.35 0 0.05"
+          animation="property: rotation;
+                     from: 0 0 0;
+                     to: 0 360 0;
+                     loop: true; dur: 6000; easing: linear"
+        ></a-entity>
+        <a-text
+          value="GLB (3D)"
+          color="#00CC66"
+          align="center"
+          position="0.35 -0.18 0.05"
+          scale="0.4 0.4 0.4"
+        ></a-text>
+
+      </a-entity>
     </a-scene>
-
-    <script>
-      // ข้อมูลวิดีโอแต่ละ EP
-      const videos = {
-        ep1: {
-          title: '📹 EP.1 — Cost Reduction',
-          // ดึง video ID จาก URL แล้วใส่ใน embed URL
-          embedUrl: 'https://www.youtube.com/embed/6zCB0QYzoXY?autoplay=1&playsinline=1'
-        },
-        ep2: {
-          title: '📹 EP.2 — Stop Waste!',
-          embedUrl: 'https://www.youtube.com/embed/Oc6S1UeHRUw?autoplay=1&playsinline=1'
-        }
-      };
-
-      function openVideo(ep) {
-        const modal = document.getElementById('video-modal');
-        const iframe = document.getElementById('yt-iframe');
-        const title  = document.getElementById('video-title');
-
-        iframe.src = videos[ep].embedUrl;
-        title.textContent = videos[ep].title;
-        modal.classList.add('active');
-      }
-
-      function closeVideo() {
-        const modal  = document.getElementById('video-modal');
-        const iframe = document.getElementById('yt-iframe');
-
-        // ✅ ล้าง src เพื่อหยุดวิดีโอทันที
-        iframe.src = '';
-        modal.classList.remove('active');
-      }
-
-      // แสดง/ซ่อน overlay ตาม target
-      const target = document.querySelector('[mindar-image-target]');
-      target.addEventListener('targetFound', () => {
-        document.getElementById('ar-overlay').style.display = 'block';
-      });
-      target.addEventListener('targetLost', () => {
-        document.getElementById('ar-overlay').style.display = 'none';
-        closeVideo(); // ปิดวิดีโอด้วยถ้า target หาย
-      });
-    </script>
   </body>
 </html>
