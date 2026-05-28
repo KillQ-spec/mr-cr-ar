@@ -10,11 +10,49 @@
     </style>
 
     <script>
-      AFRAME.registerComponent('mobile-tap', {
+      // ✅ จับ touchend บน canvas แล้ว raycast เอง — ไม่ผ่าน synthetic event
+      AFRAME.registerComponent('ar-tap-link', {
+        schema: { url: { type: 'string', default: '' } },
         init: function () {
-          this.el.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            this.el.emit('click');
+          const el = this.el;
+          const url = this.data.url;
+
+          // ✅ จับ touchstart เก็บ position ไว้
+          let touchStartX = 0, touchStartY = 0;
+
+          document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+          }, { passive: true });
+
+          document.addEventListener('touchend', (e) => {
+            const dx = Math.abs(e.changedTouches[0].clientX - touchStartX);
+            const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
+            // ถ้าไม่ได้ swipe (กดสั้นๆ)
+            if (dx < 10 && dy < 10) {
+              const touch = e.changedTouches[0];
+              const canvas = document.querySelector('canvas');
+              if (!canvas) return;
+
+              const rect = canvas.getBoundingClientRect();
+              const x = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
+              const y = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
+
+              const camera = document.querySelector('[camera]');
+              const raycaster = new THREE.Raycaster();
+              const camObj = camera.object3D;
+              const dir = new THREE.Vector3(x, y, -1).unproject(camObj).sub(camObj.position).normalize();
+              raycaster.set(camObj.position, dir);
+
+              const mesh = el.getObject3D('mesh');
+              if (!mesh) return;
+
+              const hits = raycaster.intersectObject(mesh, true);
+              if (hits.length > 0) {
+                // ✅ เปิด link ทันทีใน touchend (real user gesture)
+                location.href = url;
+              }
+            }
           });
         }
       });
@@ -36,51 +74,82 @@
       ></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0">
-        <!-- ❌ ลบ rotation="0 0 90" ออกหมดแล้ว -->
 
-        <!-- หัวข้อ: อยู่บนสุด -->
-        <a-text
-          value="Mr.CR MENU: Select Video"
-          color="#FFFFFF"
-          align="center"
-          position="0 0.65 0.01"
-          scale="0.55 0.55 0.55"
-          geometry="primitive: plane; width: 2; height: 0.2"
-          material="color: #333333; opacity: 0.85"
-        ></a-text>
+        <!-- หัวข้อ -->
+        <a-plane
+          color="#333333"
+          opacity="0.85"
+          width="1.6"
+          height="0.2"
+          position="0 0.7 0.01"
+        >
+          <a-text
+            value="Mr.CR MENU: Select Video"
+            color="#FFFFFF"
+            align="center"
+            position="0 0 0.01"
+            scale="0.5 0.5 0.5"
+            width="3"
+          ></a-text>
+        </a-plane>
 
-        <!-- ปุ่ม EP.1 : ซ้าย -->
-        <a-entity
+        <!-- ✅ ปุ่ม EP.1 -->
+        <a-plane
           id="btn-ep1"
           class="clickable"
-          geometry="primitive: plane; width: 0.75; height: 0.28"
-          material="color: #E00000; side: double"
-          position="-0.42 0.3 0.01"
-          text="value: EP.1\nCost Reduction; color: #FFFFFF; align: center; width: 2; wrapCount: 14;"
-          mobile-tap
-        ></a-entity>
+          color="#E00000"
+          width="0.72"
+          height="0.32"
+          position="-0.42 0.35 0.01"
+          ar-tap-link="url: https://www.youtube.com/watch?v=6zCB0QYzoXY"
+        >
+          <a-text
+            value="EP.1"
+            color="#FFFFFF"
+            align="center"
+            position="0 0.07 0.01"
+            scale="0.55 0.55 0.55"
+            width="2.5"
+          ></a-text>
+          <a-text
+            value="Cost Reduction"
+            color="#FFFFFF"
+            align="center"
+            position="0 -0.05 0.01"
+            scale="0.38 0.38 0.38"
+            width="2.5"
+          ></a-text>
+        </a-plane>
 
-        <!-- ปุ่ม EP.2 : ขวา -->
-        <a-entity
+        <!-- ✅ ปุ่ม EP.2 -->
+        <a-plane
           id="btn-ep2"
           class="clickable"
-          geometry="primitive: plane; width: 0.75; height: 0.28"
-          material="color: #1565C0; side: double"
-          position="0.42 0.3 0.01"
-          text="value: EP.2\nStop Waste!; color: #FFFFFF; align: center; width: 2; wrapCount: 14;"
-          mobile-tap
-        ></a-entity>
+          color="#1565C0"
+          width="0.72"
+          height="0.32"
+          position="0.42 0.35 0.01"
+          ar-tap-link="url: https://youtu.be/Oc6S1UeHRUw"
+        >
+          <a-text
+            value="EP.2"
+            color="#FFFFFF"
+            align="center"
+            position="0 0.07 0.01"
+            scale="0.55 0.55 0.55"
+            width="2.5"
+          ></a-text>
+          <a-text
+            value="Stop Waste!"
+            color="#FFFFFF"
+            align="center"
+            position="0 -0.05 0.01"
+            scale="0.38 0.38 0.38"
+            width="2.5"
+          ></a-text>
+        </a-plane>
 
       </a-entity>
     </a-scene>
-
-    <script>
-      document.querySelector('#btn-ep1').addEventListener('click', function () {
-        window.open('https://www.youtube.com/watch?v=6zCB0QYzoXY', '_blank');
-      });
-      document.querySelector('#btn-ep2').addEventListener('click', function () {
-        window.open('https://youtu.be/Oc6S1UeHRUw', '_blank');
-      });
-    </script>
   </body>
 </html>
