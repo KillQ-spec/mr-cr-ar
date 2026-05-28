@@ -17,51 +17,34 @@
       vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false"
     >
-      <a-assets timeout="10000">
-        <!-- PNG จาก GitHub -->
-        <img id="machine-png" src="./Gemini_Generated_Image_35ws6235ws6235ws.png" crossorigin="anonymous"/>
-        <!-- GLB จาก Google Drive -->
-        <a-asset-item id="machine-glb" src="https://drive.google.com/uc?export=download&id=11v1TlCG04sD75l0D0E4k-q9E8z7FFdtU" crossorigin="anonymous"></a-asset-item>
+      <a-assets>
+        <img id="machine-png"
+             src="./Gemini_Generated_Image_35ws6235ws6235ws.png"
+             crossorigin="anonymous"/>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0">
 
-        <!-- PNG ซ้าย — ลอยขึ้นลง -->
+        <!-- PNG ลอยขึ้นลง -->
         <a-image
           src="#machine-png"
-          width="0.5" height="0.5"
-          position="-0.35 0.1 0.05"
+          width="0.6" height="0.6"
+          position="0 0.1 0.05"
           animation="property: position;
-                     from: -0.35 0.1 0.05;
-                     to: -0.35 0.17 0.05;
-                     dir: alternate; loop: true; dur: 1800; easing: easeInOutSine"
+                     from: 0 0.1 0.05;
+                     to: 0 0.18 0.05;
+                     dir: alternate; loop: true;
+                     dur: 1800; easing: easeInOutSine"
         ></a-image>
+
         <a-text
           value="PNG (2D)"
           color="#FF4444"
           align="center"
-          position="-0.35 -0.18 0.05"
-          scale="0.4 0.4 0.4"
-        ></a-text>
-
-        <!-- GLB ขวา — หมุน 360° -->
-        <a-entity
-          gltf-model="#machine-glb"
-          scale="0.18 0.18 0.18"
-          position="0.35 0 0.05"
-          animation="property: rotation;
-                     from: 0 0 0;
-                     to: 0 360 0;
-                     loop: true; dur: 6000; easing: linear"
-        ></a-entity>
-        <a-text
-          value="GLB (3D)"
-          color="#00CC66"
-          align="center"
-          position="0.35 -0.18 0.05"
-          scale="0.4 0.4 0.4"
+          position="0 -0.25 0.05"
+          scale="0.5 0.5 0.5"
         ></a-text>
 
       </a-entity>
