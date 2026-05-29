@@ -51,7 +51,6 @@
         color: #00FF88;
       }
 
-      /* ✅ overlay ภาพที่ lock ไว้ — ลอยทับกล้องตลอด */
       #locked-overlay {
         position: fixed;
         top: 0; left: 0;
@@ -66,13 +65,14 @@
         object-fit: contain;
       }
 
-      /* ตำแหน่งแต่ละรูปบนหน้าจอ */
+      /* ตำแหน่งแต่ละรูปบนหน้าจอตอน Lock */
       #img-aluminum   { width: 18vw; top: 15%; left: 8%; }
       #img-worker     { width: 20vw; top: 52%; left: 5%; }
       #img-machine    { width: 24vw; top: 12%; right: 5%; }
       #img-robot      { width: 20vw; top: 38%; right: 5%; }
       #img-cnc        { width: 20vw; top: 62%; right: 5%; }
       #img-supervisor { width: 13vw; top: 58%; left: 42%; }
+      #img-gif        { width: 20vw; top: 35%; left: 40%; }
     </style>
   </head>
   <body>
@@ -80,7 +80,7 @@
     <div id="status-text">📷 ส่องกล้องไปที่ Poster</div>
     <button id="lock-btn">🔓 Lock ภาพไว้</button>
 
-    <!-- ✅ overlay ที่ lock ไว้ — แสดงทับกล้องตลอด -->
+    <!-- Overlay ตอน Lock -->
     <div id="locked-overlay">
       <img id="img-aluminum"   src="./Gemini_Generated_Image_4gxeom4gxeom4gxe-removebg-preview.png"/>
       <img id="img-worker"     src="./Gemini_Generated_Image_c852llc852llc852-removebg-preview.png"/>
@@ -88,6 +88,7 @@
       <img id="img-robot"      src="./Gemini_Generated_Image_2db6uk2db6uk2db6-removebg-preview.png"/>
       <img id="img-cnc"        src="./Gemini_Generated_Image_oz8sahoz8sahoz8s-removebg-preview.png"/>
       <img id="img-supervisor" src="./Gemini_Generated_Image_wjsw71wjsw71wjsw-removebg-preview.png"/>
+      <img id="img-gif"        src="./Tuv-dance-ezgif_com-optimize.gif"/>
     </div>
 
     <a-scene
@@ -104,17 +105,55 @@
         <img id="worker"     src="./Gemini_Generated_Image_c852llc852llc852-removebg-preview.png" crossorigin="anonymous"/>
         <img id="cnc"        src="./Gemini_Generated_Image_oz8sahoz8sahoz8s-removebg-preview.png" crossorigin="anonymous"/>
         <img id="supervisor" src="./Gemini_Generated_Image_wjsw71wjsw71wjsw-removebg-preview.png" crossorigin="anonymous"/>
+        <img id="person-gif" src="./Tuv-dance-ezgif_com-optimize.gif" crossorigin="anonymous"/>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-entity id="ar-target" mindar-image-target="targetIndex: 0">
-        <a-image src="#aluminum"   width="0.25" height="0.2"  position="-0.38 0.28 0.05"></a-image>
-        <a-image src="#worker"     width="0.28" height="0.38" position="-0.35 -0.22 0.05"></a-image>
-        <a-image src="#machine"    width="0.32" height="0.25" position="0.35 0.3 0.05"></a-image>
-        <a-image src="#robot"      width="0.28" height="0.28" position="0.38 0.05 0.05"></a-image>
-        <a-image src="#cnc"        width="0.28" height="0.32" position="0.35 -0.2 0.05"></a-image>
-        <a-image src="#supervisor" width="0.18" height="0.32" position="0.08 -0.22 0.05"></a-image>
+
+        <!-- 🔩 อลูมิเนียม — ซ้ายบน -->
+        <a-image src="#aluminum"
+          width="0.25" height="0.2"
+          position="-0.38 0.28 0.05">
+        </a-image>
+
+        <!-- 👷 คนงาน — ซ้ายล่าง -->
+        <a-image src="#worker"
+          width="0.28" height="0.38"
+          position="-0.35 -0.22 0.05">
+        </a-image>
+
+        <!-- ⚙️ เครื่องจักร — ขวาบน -->
+        <a-image src="#machine"
+          width="0.32" height="0.25"
+          position="0.35 0.3 0.05">
+        </a-image>
+
+        <!-- 🦾 Robot Arm — กลางขวา -->
+        <a-image src="#robot"
+          width="0.28" height="0.28"
+          position="0.38 0.05 0.05">
+        </a-image>
+
+        <!-- 🏭 CNC — ขวาล่าง -->
+        <a-image src="#cnc"
+          width="0.28" height="0.32"
+          position="0.35 -0.2 0.05">
+        </a-image>
+
+        <!-- 👨‍💼 Supervisor — กลางล่าง -->
+        <a-image src="#supervisor"
+          width="0.18" height="0.32"
+          position="0.08 -0.22 0.05">
+        </a-image>
+
+        <!-- 🕺 GIF — กลาง poster -->
+        <a-image src="#person-gif"
+          width="0.28" height="0.38"
+          position="0 0.05 0.06">
+        </a-image>
+
       </a-entity>
     </a-scene>
 
@@ -142,7 +181,6 @@
       lockBtn.addEventListener('click', () => {
         if (!isLocked) {
           isLocked = true;
-          // ✅ แสดง overlay HTML ทับกล้อง — ไม่หายแน่นอน
           overlay.style.display = 'block';
           lockBtn.classList.add('locked');
           lockBtn.textContent  = '🔒 Locked! กดเพื่อ Unlock';
