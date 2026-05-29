@@ -24,12 +24,13 @@
         font-family: sans-serif;
         font-weight: bold;
         backdrop-filter: blur(8px);
-        display: none; /* ซ่อนก่อน จนกว่าจะเจอ target */
+        display: none;
         cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
       }
 
       #lock-btn.locked {
-        background: rgba(0, 200, 100, 0.4);
+        background: rgba(0,200,100,0.4);
         border-color: #00CC66;
         color: #00FF88;
       }
@@ -73,71 +74,90 @@
         <img id="supervisor" src="./Gemini_Generated_Image_wjsw71wjsw71wjsw-removebg-preview.png" crossorigin="anonymous"/>
       </a-assets>
 
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+      <!-- Camera -->
+      <a-camera id="main-camera" position="0 0 0" look-controls="enabled: false">
+        <!-- ✅ ภาพจะย้ายมาติดกล้องตอน Lock -->
+        <a-entity id="locked-content" visible="false">
+          <a-image src="#aluminum"   width="0.12" height="0.09"  position="-0.18 0.13 -0.5"></a-image>
+          <a-image src="#worker"     width="0.13" height="0.18"  position="-0.17 -0.1 -0.5"></a-image>
+          <a-image src="#machine"    width="0.15" height="0.12"  position="0.17 0.14 -0.5"></a-image>
+          <a-image src="#robot"      width="0.13" height="0.13"  position="0.18 0.02 -0.5"></a-image>
+          <a-image src="#cnc"        width="0.13" height="0.15"  position="0.17 -0.1 -0.5"></a-image>
+          <a-image src="#supervisor" width="0.08" height="0.15"  position="0.04 -0.1 -0.5"></a-image>
+        </a-entity>
+      </a-camera>
 
+      <!-- AR Target -->
       <a-entity id="ar-target" mindar-image-target="targetIndex: 0">
-        <a-image src="#aluminum"   width="0.25" height="0.2"  position="-0.38 0.28 0.05"></a-image>
-        <a-image src="#worker"     width="0.28" height="0.38" position="-0.35 -0.22 0.05"></a-image>
-        <a-image src="#machine"    width="0.32" height="0.25" position="0.35 0.3 0.05"></a-image>
-        <a-image src="#robot"      width="0.28" height="0.28" position="0.38 0.05 0.05"></a-image>
-        <a-image src="#cnc"        width="0.28" height="0.32" position="0.35 -0.2 0.05"></a-image>
-        <a-image src="#supervisor" width="0.18" height="0.32" position="0.08 -0.22 0.05"></a-image>
+        <a-entity id="ar-content">
+          <a-image src="#aluminum"   width="0.25" height="0.2"  position="-0.38 0.28 0.05"></a-image>
+          <a-image src="#worker"     width="0.28" height="0.38" position="-0.35 -0.22 0.05"></a-image>
+          <a-image src="#machine"    width="0.32" height="0.25" position="0.35 0.3 0.05"></a-image>
+          <a-image src="#robot"      width="0.28" height="0.28" position="0.38 0.05 0.05"></a-image>
+          <a-image src="#cnc"        width="0.28" height="0.32" position="0.35 -0.2 0.05"></a-image>
+          <a-image src="#supervisor" width="0.18" height="0.32" position="0.08 -0.22 0.05"></a-image>
+        </a-entity>
       </a-entity>
+
     </a-scene>
 
     <script>
-      const target   = document.querySelector('#ar-target');
-      const lockBtn  = document.getElementById('lock-btn');
-      const statusEl = document.getElementById('status-text');
-      let isLocked   = false;
-      let isVisible  = false;
+      const target        = document.querySelector('#ar-target');
+      const arContent     = document.querySelector('#ar-content');
+      const lockedContent = document.querySelector('#locked-content');
+      const lockBtn       = document.getElementById('lock-btn');
+      const statusEl      = document.getElementById('status-text');
+      let isLocked        = false;
 
-      // ✅ เจอ poster → แสดงปุ่ม Lock
       target.addEventListener('targetFound', () => {
-        isVisible = true;
         if (!isLocked) {
+          arContent.setAttribute('visible', true);
           lockBtn.style.display = 'block';
           lockBtn.classList.remove('locked');
-          lockBtn.textContent   = '🔓 Lock ภาพไว้';
-          statusEl.textContent  = '✅ เจอ Poster แล้ว! กด Lock เพื่อล็อคภาพ';
+          lockBtn.textContent  = '🔓 Lock ภาพไว้';
+          statusEl.textContent = '✅ เจอ Poster! กด Lock เพื่อล็อคภาพ';
         }
       });
 
-      // ✅ หลุดจาก poster
       target.addEventListener('targetLost', () => {
-        isVisible = false;
         if (!isLocked) {
+          arContent.setAttribute('visible', false);
           lockBtn.style.display = 'none';
           statusEl.textContent  = '📷 ส่องกล้องไปที่ Poster';
-        } else {
-          statusEl.textContent  = '🔒 ภาพถูก Lock แล้ว — เดินรอบๆ ได้เลย!';
         }
       });
 
-      // ✅ กดปุ่ม Lock
       lockBtn.addEventListener('click', () => {
         if (!isLocked) {
-          // Lock — หยุด tracking แต่ภาพยังอยู่
           isLocked = true;
-          lockBtn.classList.add('locked');
-          lockBtn.textContent  = '🔒 Locked! กดอีกครั้งเพื่อ Unlock';
-          statusEl.textContent = '🔒 ภาพถูก Lock แล้ว — เดินรอบๆ ได้เลย!';
 
-          // หยุด MindAR tracking
-          const sceneEl = document.querySelector('a-scene');
-          sceneEl.systems['mindar-image-system'].pauseTracking();
+          // ✅ ซ่อนภาพที่ผูกกับ poster
+          arContent.setAttribute('visible', false);
+
+          // ✅ แสดงภาพที่ติดกับกล้องแทน — หันไปไหนภาพก็ตาม
+          lockedContent.setAttribute('visible', true);
+
+          // หยุด tracking
+          document.querySelector('a-scene')
+            .systems['mindar-image-system'].pauseTracking();
+
+          lockBtn.classList.add('locked');
+          lockBtn.textContent  = '🔒 Locked! กดเพื่อ Unlock';
+          statusEl.textContent = '🔒 ภาพ Lock แล้ว — หันกล้องไปไหนก็ได้!';
 
         } else {
-          // Unlock — กลับมา tracking ใหม่
           isLocked = false;
+
+          // ✅ กลับมา tracking ใหม่
+          lockedContent.setAttribute('visible', false);
+          arContent.setAttribute('visible', false);
+
+          document.querySelector('a-scene')
+            .systems['mindar-image-system'].resumeTracking();
+
           lockBtn.classList.remove('locked');
-          lockBtn.textContent  = '🔓 Lock ภาพไว้';
-          statusEl.textContent = '📷 ส่องกล้องไปที่ Poster';
-
-          const sceneEl = document.querySelector('a-scene');
-          sceneEl.systems['mindar-image-system'].resumeTracking();
-
-          if (!isVisible) lockBtn.style.display = 'none';
+          lockBtn.style.display = 'none';
+          statusEl.textContent  = '📷 ส่องกล้องไปที่ Poster';
         }
       });
     </script>
