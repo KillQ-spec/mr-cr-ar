@@ -51,6 +51,21 @@
         color: #00FF88;
       }
 
+      /* GIF ลอยทับ poster ตลอด */
+      #ar-gif-overlay {
+        display: none;
+        position: fixed;
+        top: 35%;
+        left: 36%;
+        z-index: 889;
+        pointer-events: none;
+      }
+
+      #ar-gif-overlay img {
+        width: 22vw;
+      }
+
+      /* Overlay ตอน Lock */
       #locked-overlay {
         position: fixed;
         top: 0; left: 0;
@@ -65,7 +80,6 @@
         object-fit: contain;
       }
 
-      /* ตำแหน่งแต่ละรูปบนหน้าจอตอน Lock */
       #img-aluminum   { width: 18vw; top: 15%; left: 8%; }
       #img-worker     { width: 20vw; top: 52%; left: 5%; }
       #img-machine    { width: 24vw; top: 12%; right: 5%; }
@@ -79,6 +93,11 @@
 
     <div id="status-text">📷 ส่องกล้องไปที่ Poster</div>
     <button id="lock-btn">🔓 Lock ภาพไว้</button>
+
+    <!-- ✅ GIF ลอยทับ poster ตลอด -->
+    <div id="ar-gif-overlay">
+      <img src="./Tuv-dance-ezgif_com-optimize.gif"/>
+    </div>
 
     <!-- Overlay ตอน Lock -->
     <div id="locked-overlay">
@@ -105,79 +124,72 @@
         <img id="worker"     src="./Gemini_Generated_Image_c852llc852llc852-removebg-preview.png" crossorigin="anonymous"/>
         <img id="cnc"        src="./Gemini_Generated_Image_oz8sahoz8sahoz8s-removebg-preview.png" crossorigin="anonymous"/>
         <img id="supervisor" src="./Gemini_Generated_Image_wjsw71wjsw71wjsw-removebg-preview.png" crossorigin="anonymous"/>
-        <img id="person-gif" src="./Tuv-dance-ezgif_com-optimize.gif" crossorigin="anonymous"/>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-entity id="ar-target" mindar-image-target="targetIndex: 0">
 
-        <!-- 🔩 อลูมิเนียม — ซ้ายบน -->
         <a-image src="#aluminum"
           width="0.25" height="0.2"
           position="-0.38 0.28 0.05">
         </a-image>
 
-        <!-- 👷 คนงาน — ซ้ายล่าง -->
         <a-image src="#worker"
           width="0.28" height="0.38"
           position="-0.35 -0.22 0.05">
         </a-image>
 
-        <!-- ⚙️ เครื่องจักร — ขวาบน -->
         <a-image src="#machine"
           width="0.32" height="0.25"
           position="0.35 0.3 0.05">
         </a-image>
 
-        <!-- 🦾 Robot Arm — กลางขวา -->
         <a-image src="#robot"
           width="0.28" height="0.28"
           position="0.38 0.05 0.05">
         </a-image>
 
-        <!-- 🏭 CNC — ขวาล่าง -->
         <a-image src="#cnc"
           width="0.28" height="0.32"
           position="0.35 -0.2 0.05">
         </a-image>
 
-        <!-- 👨‍💼 Supervisor — กลางล่าง -->
         <a-image src="#supervisor"
           width="0.18" height="0.32"
           position="0.08 -0.22 0.05">
-        </a-image>
-
-        <!-- 🕺 GIF — กลาง poster -->
-        <a-image src="#person-gif"
-          width="0.28" height="0.38"
-          position="0 0.05 0.06">
         </a-image>
 
       </a-entity>
     </a-scene>
 
     <script>
-      const target   = document.querySelector('#ar-target');
-      const overlay  = document.getElementById('locked-overlay');
-      const lockBtn  = document.getElementById('lock-btn');
-      const statusEl = document.getElementById('status-text');
-      let isLocked   = false;
+      const target     = document.querySelector('#ar-target');
+      const overlay    = document.getElementById('locked-overlay');
+      const gifOverlay = document.getElementById('ar-gif-overlay');
+      const lockBtn    = document.getElementById('lock-btn');
+      const statusEl   = document.getElementById('status-text');
+      let isLocked     = false;
 
+      // ✅ เจอ poster — แสดง GIF + ปุ่ม Lock
       target.addEventListener('targetFound', () => {
+        gifOverlay.style.display = 'block';
         if (!isLocked) {
           lockBtn.style.display = 'block';
           statusEl.textContent  = '✅ เจอ Poster! กด Lock เพื่อล็อคภาพ';
         }
       });
 
+      // ✅ หลุด poster — ซ่อน GIF (ถ้าไม่ได้ lock)
       target.addEventListener('targetLost', () => {
         if (!isLocked) {
-          lockBtn.style.display = 'none';
-          statusEl.textContent  = '📷 ส่องกล้องไปที่ Poster';
+          gifOverlay.style.display = 'none';
+          lockBtn.style.display    = 'none';
+          statusEl.textContent     = '📷 ส่องกล้องไปที่ Poster';
         }
       });
 
+      // ✅ กดปุ่ม Lock
       lockBtn.addEventListener('click', () => {
         if (!isLocked) {
           isLocked = true;
@@ -187,10 +199,11 @@
           statusEl.textContent = '🔒 ภาพ Lock แล้ว — หันกล้องไปไหนก็ได้!';
         } else {
           isLocked = false;
-          overlay.style.display = 'none';
+          overlay.style.display    = 'none';
+          gifOverlay.style.display = 'none';
           lockBtn.classList.remove('locked');
-          lockBtn.style.display = 'none';
-          statusEl.textContent  = '📷 ส่องกล้องไปที่ Poster';
+          lockBtn.style.display    = 'none';
+          statusEl.textContent     = '📷 ส่องกล้องไปที่ Poster';
         }
       });
     </script>
