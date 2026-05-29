@@ -51,7 +51,6 @@
         color: #00FF88;
       }
 
-      /* GIF ลอยทับ poster ตลอด */
       #ar-gif-overlay {
         display: none;
         position: fixed;
@@ -65,7 +64,6 @@
         width: 22vw;
       }
 
-      /* Overlay ตอน Lock */
       #locked-overlay {
         position: fixed;
         top: 0; left: 0;
@@ -96,7 +94,7 @@
 
     <!-- ✅ GIF ลอยทับ poster ตลอด -->
     <div id="ar-gif-overlay">
-      <img src="./Tuv-dance-ezgif_com-optimize.gif"/>
+      <img src="./Tuv-dance-ezgif.com-optimize.gif"/>
     </div>
 
     <!-- Overlay ตอน Lock -->
@@ -107,7 +105,7 @@
       <img id="img-robot"      src="./Gemini_Generated_Image_2db6uk2db6uk2db6-removebg-preview.png"/>
       <img id="img-cnc"        src="./Gemini_Generated_Image_oz8sahoz8sahoz8s-removebg-preview.png"/>
       <img id="img-supervisor" src="./Gemini_Generated_Image_wjsw71wjsw71wjsw-removebg-preview.png"/>
-      <img id="img-gif"        src="./Tuv-dance-ezgif_com-optimize.gif"/>
+      <img id="img-gif"        src="./Tuv-dance-ezgif.com-optimize.gif"/>
     </div>
 
     <a-scene
@@ -171,7 +169,6 @@
       const statusEl   = document.getElementById('status-text');
       let isLocked     = false;
 
-      // ✅ เจอ poster — แสดง GIF + ปุ่ม Lock
       target.addEventListener('targetFound', () => {
         gifOverlay.style.display = 'block';
         if (!isLocked) {
@@ -180,7 +177,6 @@
         }
       });
 
-      // ✅ หลุด poster — ซ่อน GIF (ถ้าไม่ได้ lock)
       target.addEventListener('targetLost', () => {
         if (!isLocked) {
           gifOverlay.style.display = 'none';
@@ -189,7 +185,6 @@
         }
       });
 
-      // ✅ กดปุ่ม Lock
       lockBtn.addEventListener('click', () => {
         if (!isLocked) {
           isLocked = true;
